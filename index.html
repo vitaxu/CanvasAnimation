@@ -11,41 +11,30 @@
       e=d.documentElement,b="orientationchange" in window?"orientationchange":"resize",a=function(){var
         f=e.clientWidth;if(!f){return}e.style.fontSize=100*(f/375)+"px"};if(!d.addEventListener){return}c.addEventListener(b,a,false);d.addEventListener("DOMContentLoaded",a,false)})(document,window);
   </script>
-  <!-- build:css-->
   <link rel="stylesheet" href="css/main.css">
-  <!-- endbuild-->
   <title>Canvas实现逐祯动画</title>
 </head>
 <body>
 
-<!-- loading/S -->
-<section class="load-page">
-  <div class="loading">
-    <div class="inner">
-      <div class="star star-inner"></div>
-      <div class="star star-outer"></div>
-    </div>
-    <div class="loading-num">0%</div>
-  </div>
-</section>
-<!-- loading/E -->
-
 <!-- animation/S -->
-<section class="layout">
-  <canvas id="canvas" width="112" height="100" style="top: 50px; left: 35%" data-time="200" data-loop="true">
-  <!--<canvas id="canvas" width="375" height="667" data-time="40" data-loop="false">-->
-    <img src="http://mat1.gtimg.com/ent/vitaxu/2016/bigBang/img/loading2.png" width="224" height="600">
-    <!--<img src="http://mat1.gtimg.com/ent/vitaxu/starTalk/1/cover-keyframe.png" width="8250" height="1334">-->
+<section>
+
+  <canvas id="canvas1" width="112" height="100" data-time="200" data-loop="true">
+    <img data-src="http://mat1.gtimg.com/ent/vitaxu/2016/bigBang/img/loading2.png" width="224" height="600">
   </canvas>
+
+  <canvas id="canvas2" width="375" height="667">
+    <img src="http://mat1.gtimg.com/ent/vitaxu/starTalk/1/cover-keyframe.png" width="8250" height="1334">
+  </canvas>
+
 </section>
 <!-- animation/E -->
 
-<script type="text/javascript">
-  // loading  图片预加载项
-  var loadPics = ["http://mat1.gtimg.com/ent/vitaxu/starTalk/1/cover-keyframe.png"];
+<script src="js/frame.min.js" charset="utf-8"></script>
+<script>
+  window.onload = function() {
+    Frame('canvas2');
+  }
 </script>
-<script src="http://mat1.gtimg.com/www/mobi/js/zepto.min.js"></script>
-<script src="js/frame.js" charset="utf-8"></script>
-<script src="js/main.js?v=b599b4b" charset="utf-8"></script>
 </body>
 </html>

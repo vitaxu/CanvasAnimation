@@ -2,13 +2,13 @@
 
   var AFrame = function(id) {
 
-    this.canvas = document.querySelector('#' + id);
+    this.canvas = document.getElementById(id);
 
     this.context = this.canvas.getContext('2d');
 
-    this.cW  = canvas.width;
+    this.cW  = this.canvas.width;
 
-    this.cH = canvas.height;
+    this.cH = this.canvas.height;
 
     this.time = this.canvas.getAttribute('data-time') || 50;
 
@@ -16,7 +16,7 @@
 
     this.chLoop = this.loop == 'true' ? '\u5faa\u73af' : '\u0031\u6b21';
 
-    this.image = this.canvas.querySelector('img');
+    this.image = this.canvas.getElementsByTagName('img')[0];
 
     this.iW = this.image.getAttribute('width');
 
@@ -79,14 +79,19 @@
 
     renderFrame : function() {
       var that = this,
+
           now = Date.now();
 
       that.timeDiff = now - that.startTime;
 
       if(that.timeDiff > that.time){
+
         that.startTime = now - (that.timeDiff % that.time);
+
         that.curFrame ++;
+
         that.drawFrame();
+
       }
 
       window.requestAniFrame(function() {
@@ -94,9 +99,13 @@
         if(that.flag) that.renderFrame();
 
         if(that.loop == 'true'){
+
           that.curFrame == (that.totalFrame - 1) && (that.curFrame = 0);
+
         }else if(that.loop == 'false'){
+
           that.curFrame == (that.totalFrame - 1) && (that.flag = false);
+
         }
       });
 
@@ -104,29 +113,44 @@
 
     retinaCanvas : function() {
       var devicePixelRatio = window.devicePixelRatio || 1,
+
           backingStoreRatio = this.context.webkitBackingStorePixelRatio || this.context.backingStorePixelRatio || 1,
+
           ratio = devicePixelRatio / backingStoreRatio;
 
       if (ratio !== 1) {
-        canvas.width        = this.cW * ratio;
-        canvas.height       = this.cH * ratio;
-        canvas.style.width  = this.cW / 100 + 'rem';
-        canvas.style.height = this.cH / 100 + 'rem';
+
+        this.canvas.width        = this.cW * ratio;
+
+        this.canvas.height       = this.cH * ratio;
+
+        this.canvas.style.width  = this.cW / 100 + 'rem';
+
+        this.canvas.style.height = this.cH / 100 + 'rem';
+
         this.context.scale(ratio, ratio);
+
       }
     }
 
   }
 
   window.requestAniFrame = (function() {
+
     return window.requestAnimationFrame || window.webkitRequestAnimationFrame ||
+
            function(callback) {
+
              window.setTimeout(callback, 1000 / 60);
+
            };
+
   })();
 
   var Frame = window['Frame'] =  function(id) {
+
     return new AFrame(id);
+
   };
 
 })(window);

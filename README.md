@@ -12,7 +12,7 @@
         <img src="http://mat1.gtimg.com/ent/vitaxu/2016/bigBang/img/loading2.png" width="224" height="600">
     </canvas>
 
-> canvas2
+> canvas2   [点击预览](https://vitaxu.github.io/CanvasAnimation/)  （移动端效果更佳）
 
     <canvas id="canvas2" width="375" height="667">
         <img src="http://mat1.gtimg.com/ent/vitaxu/starTalk/1/cover-keyframe.png" width="8250" height="1334">
@@ -20,7 +20,7 @@
 
 #### 参数说明：
 
-canvas  
+canvas 
 
 * `id` 必填，JS调用时填入此id
 * `width` 必填，需要渲染的宽度

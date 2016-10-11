@@ -1,20 +1,17 @@
+var page = {
 
-var page = null;
+  loadPage : $('.load-page'),
 
-window.onload = function(){
-  page = new Page();
-  page.init();
-};
+  layout : $('.layout'),
 
-var Page = function(){
-  this.loadPage   = $('.load-page');
-  this.layout     = $('.layout');
-};
-
-Page.prototype = {
-  init:function(){
-    this.showLayout();
-    return this;
+  init: function(){
+    var that = this;
+    this.lazyLoad(loadPics, function() {
+      setTimeout(function () {
+        that.loadPage.hide();
+        Frame('canvas');
+      },1000);
+    });
   },
 
   lazyLoad: function(pics, callback){
@@ -30,7 +27,7 @@ Page.prototype = {
       img.onload = function() {
         progress(Math.floor(((index + 1) / len) * 100) + "%");
         index ++ ;
-        (index < len) ? load() : callback();
+        (index < len) && load();
       }
       return img;
     }
@@ -42,17 +39,6 @@ Page.prototype = {
     };
   },
 
-  showLayout:function(){
-    var that = this;
-    this.lazyLoad(loadPics, function(){
-      setTimeout(function () {
-        that.loadPage.addClass('fadeOut');
-        that.layout.addClass('fadeIn');
-        setTimeout(function() {
-          that.loadPage.hide();
-          $.aFrame();
-        },250);
-      },1000);
-    });
-  },
 };
+
+page.init();

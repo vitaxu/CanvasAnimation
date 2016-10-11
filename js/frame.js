@@ -1,14 +1,122 @@
-;(function($, window, undefined) {
+;(function(window) {
 
-  var canvas       = document.getElementById('canvas'),
-      context      = canvas.getContext('2d'),
-      canvasWidth  = canvas.width,
-      canvasHeight = canvas.height,
-      curFrame = 0,
-      totalFrame = 0,
-      flag = true,
-      timeDiff = 0,
-      startTime = Date.now();
+  var AFrame = function(id) {
+
+    this.canvas = document.querySelector('#' + id);
+
+    this.context = this.canvas.getContext('2d');
+
+    this.cW  = canvas.width;
+
+    this.cH = canvas.height;
+
+    this.time = this.canvas.getAttribute('data-time') || 50;
+
+    this.loop = this.canvas.getAttribute('data-loop') || 'false';
+
+    this.chLoop = this.loop == 'true' ? '\u5faa\u73af' : '\u0031\u6b21';
+
+    this.image = this.canvas.querySelector('img');
+
+    this.iW = this.image.getAttribute('width');
+
+    this.iH = this.image.getAttribute('height');
+
+    this.curFrame = 0;
+
+    this.direction = this.cW * 2 == this.iW ? 'vertical' : 'horizontal';
+
+    this.totalFrame = this.direction == 'vertical'
+        ? this.iH / this.cH / 2 : this. iW / this.cW / 2;
+
+    this.flag = true;
+
+    this.timeDiff = 0;
+
+    this.startTime = Date.now();
+
+    this.init();
+
+    console.info('\u52a8\u753b\u4fe1\u606f --> \u603b\u5e27\u6570: '
+                 + this.totalFrame
+                 + ', \u8fd0\u52a8\u6b21\u6570: ' + this.chLoop
+                 + ', \u95f4\u9694\u65f6\u95f4: ' + this.time + 's'
+    );
+
+  }
+
+  AFrame.prototype = {
+
+    init : function() {
+
+      this.renderFrame();
+
+      this.retinaCanvas();
+
+    },
+
+    drawFrame : function() {
+
+      var that = this,
+
+          _x = this.direction == 'horizontal'
+              ? that.curFrame * that.iW / that.totalFrame : 0,
+
+          _y = this.direction == 'horizontal'
+              ? 0 : that.curFrame * that.iH / that.totalFrame,
+
+          _w = this.direction == 'horizontal'
+              ? that.iW / that.totalFrame : that.iW,
+
+          _h = this.direction == 'horizontal'
+              ? that.iH : that.iH / that.totalFrame;
+
+      that.context.clearRect(0, 0, that.cW, that.cH);
+
+      that.context.drawImage(that.image, _x, _y, _w, _h, 0, 0, that.cW, that.cH);
+
+    },
+
+    renderFrame : function() {
+      var that = this,
+          now = Date.now();
+
+      that.timeDiff = now - that.startTime;
+
+      if(that.timeDiff > that.time){
+        that.startTime = now - (that.timeDiff % that.time);
+        that.curFrame ++;
+        that.drawFrame();
+      }
+
+      window.requestAniFrame(function() {
+
+        if(that.flag) that.renderFrame();
+
+        if(that.loop == 'true'){
+          that.curFrame == (that.totalFrame - 1) && (that.curFrame = 0);
+        }else if(that.loop == 'false'){
+          that.curFrame == (that.totalFrame - 1) && (that.flag = false);
+        }
+      });
+
+    },
+
+    retinaCanvas : function() {
+      var devicePixelRatio = window.devicePixelRatio || 1,
+          backingStoreRatio = this.context.webkitBackingStorePixelRatio || this.context.backingStorePixelRatio || 1,
+          ratio = devicePixelRatio / backingStoreRatio;
+
+      if (ratio !== 1) {
+        canvas.width        = this.cW * ratio;
+        canvas.height       = this.cH * ratio;
+        canvas.style.width  = this.cW / 100 + 'rem';
+        canvas.style.height = this.cH / 100 + 'rem';
+        this.context.scale(ratio, ratio);
+      }
+    }
+
+  }
 
   window.requestAniFrame = (function() {
     return window.requestAnimationFrame || window.webkitRequestAnimationFrame ||
@@ -17,107 +125,8 @@
            };
   })();
 
-  var AFrame = function(options) {
+  var Frame = window['Frame'] =  function(id) {
+    return new AFrame(id);
+  };
 
-    this.settings = $.extend({}, AFrame.defaults, options);
-
-    this.init();
-
-  }
-
-  AFrame.prototype = {
-
-    init : function() {
-      var that = this;
-      that.renderFrame();
-      that.retinaCanvas();
-    },
-
-    drawFrame : function() {
-
-      var that = this, image = new Image();
-
-      image.src = that.settings.img;
-      totalFrame = that.settings.width / canvasWidth / 2;
-
-      console.log(totalFrame);
-
-      context.clearRect(0, 0, canvasWidth, canvasHeight);
-
-      context.drawImage(
-          image,                          //规定要使用的图像、画布或视频。
-          curFrame * that.settings.width / totalFrame,  //开始剪切的 x 坐标位置
-          0,                                          //开始剪切的 y 坐标位置
-          that.settings.width / totalFrame,        //被剪切图像的宽度
-          that.settings.height,                    //被剪切图像的高度
-          0,                                          //在画布上放置图像的 x 坐标位置。
-          0,                                          //在画布上放置图像的 y 坐标位置。
-          canvasWidth,                                //要使用的图像的宽度
-          canvasHeight                                //要使用的图像的高度
-      );
-    },
-
-    renderFrame : function() {
-      var that = this,
-          now = Date.now(),
-          time = this.settings.time,
-          timeDiff = now - startTime;
-
-      if(timeDiff > time){
-        startTime = now - (timeDiff % time);
-        curFrame ++;
-        console.log(curFrame);
-        that.drawFrame();
-      }
-
-      requestAniFrame(function() {
-        if(flag) that.renderFrame();
-        if(!that.settings.isLoop && curFrame == (totalFrame - 1)){
-          flag = false;
-        }
-      });
-
-    },
-
-    retinaCanvas : function() {
-      var devicePixelRatio = window.devicePixelRatio || 1,
-          backingStoreRatio = context.webkitBackingStorePixelRatio || context.backingStorePixelRatio || 1,
-          ratio = devicePixelRatio / backingStoreRatio;
-
-      if (ratio !== 1) {
-        canvas.width        = canvasWidth * ratio;
-        canvas.height       = canvasHeight * ratio;
-        canvas.style.width  = canvasWidth / 100 + 'rem';
-        canvas.style.height = canvasHeight / 100 + 'rem';
-        context.scale(ratio, ratio);
-      }
-    }
-
-  }
-
-  AFrame.defaults = {
-
-    // 图片
-    img: 'http://mat1.gtimg.com/ent/vitaxu/starTalk/1/cover-keyframe.png',
-
-    // 图片实际宽度
-    width: 8250,
-
-    // 图片实际高度
-    height: 1334,
-
-    // 每帧间隔时间
-    time: 50,
-
-    // 是否循环
-    isLoop: false
-
-  }
-
-  var Frame = function(options) {
-    return new AFrame(options);
-  }
-
-  window.Frame = $.aFrame = $.Frame = Frame;
-
-})(window.jQuery || window.Zepto, window);
+})(window);

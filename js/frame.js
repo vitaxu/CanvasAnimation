@@ -1,8 +1,10 @@
 ;(function(window) {
 
-  var AFrame = function(id) {
+  var AFrame = function() {
 
-    this.canvas = document.getElementById(id);
+    this.args = arguments;
+
+    this.canvas = document.getElementById(this.args[0]);
 
     this.context = this.canvas.getContext('2d');
 
@@ -37,10 +39,10 @@
 
     this.init();
 
-    console.info('\u52a8\u753b\u4fe1\u606f --> \u603b\u5e27\u6570: '
-                 + this.totalFrame
-                 + ', \u8fd0\u52a8\u6b21\u6570: ' + this.chLoop
-                 + ', \u95f4\u9694\u65f6\u95f4: ' + this.time + 's'
+    console.log('\u52a8\u753b\u4fe1\u606f --> \u603b\u5e27\u6570: '
+                + this.totalFrame
+                + ', \u8fd0\u52a8\u6b21\u6570: ' + this.chLoop
+                + ', \u95f4\u9694\u65f6\u95f4: ' + this.time + 's'
     );
 
   }
@@ -49,9 +51,33 @@
 
     init : function() {
 
-      this.renderFrame();
+      var that = this;
 
-      this.retinaCanvas();
+      this.loadPic(function() {
+
+        that.renderFrame();
+
+        that.retinaCanvas();
+
+      });
+
+    },
+
+    loadPic: function(callback) {
+
+      var that = this, img = new Image();
+
+      img.src = that.image.getAttribute('src');
+
+      img.onload = function() {
+
+        if (callback && typeof callback === "function"){
+
+          return callback();
+
+        }
+
+      }
 
     },
 
@@ -78,6 +104,7 @@
     },
 
     renderFrame : function() {
+
       var that = this,
 
           now = Date.now();
@@ -96,22 +123,40 @@
 
       window.requestAniFrame(function() {
 
-        if(that.flag) that.renderFrame();
-
         if(that.loop == 'true'){
 
           that.curFrame == (that.totalFrame - 1) && (that.curFrame = 0);
 
         }else if(that.loop == 'false'){
 
-          that.curFrame == (that.totalFrame - 1) && (that.flag = false);
+          if(that.curFrame == (that.totalFrame - 1)){
+
+            that.flag = false;
+
+            setTimeout(that.onComplete(that.args[1]), 500);
+
+          }
 
         }
+
+        if(that.flag) that.renderFrame();
+
       });
 
     },
 
+    onComplete: function(fn) {
+
+      if (fn && typeof fn === "function"){
+
+        return fn();
+
+      }
+
+    },
+
     retinaCanvas : function() {
+
       var devicePixelRatio = window.devicePixelRatio || 1,
 
           backingStoreRatio = this.context.webkitBackingStorePixelRatio || this.context.backingStorePixelRatio || 1,
@@ -147,9 +192,9 @@
 
   })();
 
-  var Frame = window['Frame'] =  function(id) {
+  var Frame = window['Frame'] =  function(id, fn) {
 
-    return new AFrame(id);
+    return new AFrame(id, fn);
 
   };
 

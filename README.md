@@ -36,14 +36,12 @@ img
 
 ### js调用：
 
-在页面中引用`frame.min.js`，然后在自己的js代码中调用即可；  
+在页面中引用`frame.min.js`，然后在自己的js代码中调用即可  
 
-    Frame(id);
+    Frame(id,callback) 
 
+####参数说明：  
 
-### 依赖
+* `id` 必填，canvas元素的id选择器
 
-无。
-
-
-
+* `callback` 选填，动画完成一次之后的回调函数，对循环动画无效
